@@ -21,17 +21,17 @@ int delete(FILE *, char *);
 /* Utility functions  */
 FILE * open_db_file(); /* Opens the database file. Prints error and
                           quits if it's not available */
-void print_usage(char *, char *);  /* Prints usage */
-entry *load_entries(FILE *);         /* Load all entries from the
+void print_usage(char , char *);  /* Prints usage */
+entry load_entries(FILE *);         /* Load all entries from the
                                       database file. Returns pointer
                                       to first entry */
-entry *create_entry_node(char *, char *);  /* Create a new entry
+entry create_entry_node(char *, char *);  /* Create a new entry
                                               node. Has to be freed by
                                               user. */
-void free_entries(entry *); /* TBD Given the first node of a linked list
+void free_entries(entry ); /* TBD Given the first node of a linked list
                                of entries, will free all the nodes */ 
 
-void write_all_entries(entry *); /* Given the first node of a linked
+void write_all_entries(entry ); /* Given the first node of a linked
                                     list of entries, will delete the
                                     database file on the disk and save
                                     the given entries into the file */
@@ -62,12 +62,25 @@ int main(int argc, char *argv[]) {
     fclose(fp);
     exit(0);
   } else if (strcmp(argv[1], "search") == 0) {  /* Handle search */
-    printf("NOT IMPLEMENTED!\n"); /* TBD  */
-  } else if (strcmp(argv[1], "delete") == 0) {  /* Handle delete */
     if (argc != 3) {
-      print_usage("Improper arguments for delete", argv[0]);
+      print_usage("Improper arguments for search", argv[0]);
       exit(1);
     }
+    FILE *fp = open_db_file();
+    char *name = argv[2];
+    if (!search(fp, name)){
+    printf("no match\n");
+    fclose(fp);
+    exit(1);
+    }
+    fclose(fp);
+    exit(0);
+    //printf(""NOT IMPLEMENTED!\n);/*TBD*/
+  } else if (strcmp(argv[1], "delete") == 0){
+  if (argc != 3){
+  print_usage("Improper arguments for delete", argv[0]); 
+  exit(1);
+  }
     FILE *fp = open_db_file();
     char *name = argv[2];
     if (!delete(fp, name)) {
@@ -94,7 +107,14 @@ FILE *open_db_file() {
   
 void free_entries(entry *p) {
   /* TBD */
-  printf("Memory is not being freed. This needs to be fixed!\n");  
+  entry *tmp = NULL;
+  while (p != NULL){
+    tmp = p->next;
+    free(p);
+    p = tmp;
+  }
+    p = NULL;
+ // printf("Memory is not being freed. This needs to be fixed!\n");  
 }
 
 void print_usage(char *message, char *progname) {
@@ -176,13 +196,16 @@ void add(char *name, char *phone) {
 }
 
 void list(FILE *db_file) {
+int count = 0;
   entry *p = load_entries(db_file);
   entry *base = p;
   while (p!=NULL) {
     printf("%-20s : %10s\n", p->name, p->phone);
     p=p->next;
+    count++;
   }
   /* TBD print total count */
+  printf("Total entries : %i\n", count);
   free_entries(base);
 }
 
@@ -191,7 +214,7 @@ int delete(FILE *db_file, char *name) {
   entry *p = load_entries(db_file);
   entry *base = p;
   entry *prev = NULL;
-  entry *del = NULL ; /* Node to be deleted */
+  entry del = NULL ; /* Node to be deleted */
   int deleted = 0;
   while (p!=NULL) {
     if (strcmp(p->name, name) == 0) {
@@ -207,9 +230,41 @@ int delete(FILE *db_file, char *name) {
       */
 
       /* TBD */
+      if (prev == NULL){
+      del = p;
+      base = p->next;
+      p = p->next;
+      free(del);
+      }
+      else{
+      prev->next = p->next;
+      free(p);
+      }
+      deleted++;
+      break;
+    }
+    if (!deleted){
+    prev = p;
+    p = p->next;
     }
   }
   write_all_entries(base);
   free_entries(base);
   return deleted;
+}
+
+int search(FILE *db_file, char *name){
+  entry *p = load_entries(db_file);
+  entry *base = p;
+  int found = 0;
+  while (p!=NULL) {
+    if (strcmp(p->name, name) == 0) {
+      printf("%10s\n", p->phone);
+      found++;
+      break;
+    }
+	p=p->next;
+  }
+  free_entries(base);
+	return found;
 }
