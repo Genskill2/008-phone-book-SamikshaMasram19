@@ -21,17 +21,17 @@ int delete(FILE *, char *);
 /* Utility functions  */
 FILE * open_db_file(); /* Opens the database file. Prints error and
                           quits if it's not available */
-void print_usage(char , char *);  / Prints usage */
-entry load_entries(FILE *);         / Load all entries from the
+void print_usage(char , char *);  /* Prints usage */
+entry load_entries(FILE *);         /* Load all entries from the
                                       database file. Returns pointer
                                       to first entry */
-entry create_entry_node(char *, char *);  / Create a new entry
+entry create_entry_node(char *, char *);  /* Create a new entry
                                               node. Has to be freed by
                                               user. */
-void free_entries(entry ); / TBD Given the first node of a linked list
+void free_entries(entry ); /* TBD Given the first node of a linked list
                                of entries, will free all the nodes */
 
-void write_all_entries(entry ); / Given the first node of a linked
+void write_all_entries(entry ); /* Given the first node of a linked
                                     list of entries, will delete the
                                     database file on the disk and save
                                     the given entries into the file */
@@ -151,20 +151,17 @@ entry *load_entries(FILE *fp) {
   entry *tmp = NULL;
   /* Description of %20[^,\n]
      % is the start of the specifier (like %s, %i etc.)
-
      20 is the maximum number of characters that this will take. We
         know that names and phone numbers will be 20 bytes maximum so
         we limit it to that. %20s will read in 20 character strings
         (including the , to separate the name and phone number. That's
         why we use
-
     [^,\n] Square brackets are used to indicate a set of allowed
            characters [abc] means only a, b, or c. With the ^, it's
            used to specify a set of disallowed characters. So [^abc]
            means any character except a, b, or c. [^,] means any
            character except a , [^,\n] means any character except a
            comma(,) or a newline(\n).
-
     %20[^,\n] will match a string of characters with a maximum length
      of 20 characters that doesn't have a comma(,) or a newline(\n).
   */
@@ -220,12 +217,9 @@ int delete(FILE *db_file, char *name) {
     if (strcmp(p->name, name) == 0) {
       /* Matching node found. Delete it from the linked list.
          Deletion from a linked list like this
-
              p0 -> p1 -> p2
-
          means we have to make p0->next point directly to p2. The p1
          "node" is removed and free'd.
-
          If the node to be deleted is p0, it's a special case.
       */
 
